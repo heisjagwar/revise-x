@@ -9,6 +9,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 export const metadata: Metadata = {
   title: 'Recall',
   description: 'A smart revision tracker.',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
