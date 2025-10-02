@@ -27,7 +27,7 @@ const createInitialTopics = (): Topic[] => {
         },
         {
             id: '2',
-            name: 'Revision in: 5 days',
+            name: 'General Relativity',
             category: 'DSA',
             createdAt: formatISO(sub(now, {days: 7})),
             revisions: REVISION_DAYS.map((day, index) => ({
@@ -49,7 +49,7 @@ const createInitialTopics = (): Topic[] => {
         },
         {
             id: '4',
-            name: 'Theromdynamics',
+            name: 'Thermodynamics',
             category: 'OOPs',
             createdAt: formatISO(sub(now, { days: 2 })),
             revisions: REVISION_DAYS.map(day => ({

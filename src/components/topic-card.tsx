@@ -47,8 +47,6 @@ export function TopicCard({ topic, setTopics }: TopicCardProps) {
     );
   };
   
-  const completedRevisionsCount = topic.revisions.filter(r => r.completed).length;
-
   return (
     <Card className={`flex flex-col transition-all duration-300 hover:shadow-xl hover:border-primary/50 bg-card border-border`}>
         <CardHeader className="p-4">
