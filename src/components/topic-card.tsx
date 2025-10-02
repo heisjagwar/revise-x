@@ -1,10 +1,9 @@
-
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import type { Topic } from '@/lib/types';
 import { format, parseISO, differenceInDays, isPast, isToday } from 'date-fns';
-import { History, Trash2, Calendar, Tags } from 'lucide-react';
+import { History, Trash2, Calendar, Tags, CheckCircle2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 import { Checkbox } from './ui/checkbox';
@@ -32,15 +31,14 @@ export function TopicCard({ topic, setTopics }: TopicCardProps) {
     isDue = isPast(dueDate) || isToday(dueDate);
   }
   
-  const handleToggleRevision = () => {
-    if (!nextRevision || !isDue) return;
+  const handleToggleRevision = (checked: boolean) => {
+    if (!nextRevision) return;
 
     setTopics(prevTopics => 
       prevTopics.map(t => {
         if (t.id === topic.id) {
-          // Find the specific revision and toggle its completed status
           const newRevisions = t.revisions.map(rev => 
-            rev.day === nextRevision.day ? { ...rev, completed: !rev.completed } : rev
+            rev.day === nextRevision.day ? { ...rev, completed: checked } : rev
           );
           return { ...t, revisions: newRevisions };
         }
@@ -52,14 +50,20 @@ export function TopicCard({ topic, setTopics }: TopicCardProps) {
   const completedRevisionsCount = topic.revisions.filter(r => r.completed).length;
 
   return (
-    <Card className={`flex flex-col transition-all duration-300 hover:shadow-xl bg-card border-border`}>
+    <Card className={`flex flex-col transition-all duration-300 hover:shadow-xl hover:border-primary/50 bg-card border-border`}>
         <CardHeader className="p-4">
-            <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-bold">{topic.name}</CardTitle>
+            <div className="flex items-start justify-between gap-2">
+                <div className="flex flex-col gap-2">
+                    <CardTitle className="text-lg font-bold">{topic.name}</CardTitle>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                        <Tags className="h-4 w-4 mr-2" />
+                        <Badge variant="secondary">{topic.category}</Badge>
+                    </div>
+                </div>
                  <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive flex-shrink-0">
-                            <Trash2 className="h-5 w-5" />
+                        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive flex-shrink-0 h-8 w-8">
+                            <Trash2 className="h-4 w-4" />
                         </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
@@ -79,52 +83,49 @@ export function TopicCard({ topic, setTopics }: TopicCardProps) {
                     </AlertDialogContent>
                 </AlertDialog>
             </div>
-            <div className="flex items-center text-sm text-muted-foreground pt-1">
-                <Tags className="h-4 w-4 mr-2" />
-                <Badge variant="secondary">{topic.category}</Badge>
-            </div>
         </CardHeader>
         <CardContent className="p-4 pt-0 flex flex-col gap-4">
-            <div className="flex items-center text-sm text-muted-foreground">
-                <History className="h-4 w-4 mr-2" />
-                <span>Added on: {format(parseISO(topic.createdAt), 'MMM d, yyyy')}</span>
+            <div className="flex items-center text-xs text-muted-foreground">
+                <History className="h-3 w-3 mr-2" />
+                <span>Added on: {format(parseISO(topic.createdAt), 'do MMM, yyyy')}</span>
             </div>
             
-            <div className="flex items-center justify-between p-3 rounded-md bg-background/50">
-              <div className="flex items-center gap-3">
-                  <Checkbox 
-                    id={`check-${topic.id}`} 
-                    disabled={!isDue}
-                    checked={nextRevision ? nextRevision.completed : true}
-                    onCheckedChange={handleToggleRevision}
-                  />
-                  <div className='flex flex-col'>
-                    <label
-                      htmlFor={`check-${topic.id}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            <div className="flex flex-col gap-2 p-3 rounded-md bg-secondary/30">
+                <div className="flex items-center gap-3">
+                    <Checkbox
+                        id={`check-${topic.id}`}
+                        disabled={!isDue}
+                        checked={nextRevision ? nextRevision.completed : true}
+                        onCheckedChange={handleToggleRevision}
+                    />
+                     <label
+                        htmlFor={`check-${topic.id}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
                     >
-                      {nextRevision ? 'Next Revision' : 'All Revisions Done!'}
+                        {nextRevision ? 'Mark as Revised' : 'All Revisions Done!'}
                     </label>
-                    {nextRevision ? (
-                      <p className="text-sm text-muted-foreground flex items-center mt-1">
+                </div>
+                {nextRevision ? (
+                      <div className="pl-7 text-sm text-muted-foreground flex items-center mt-1">
                         <Calendar className="h-4 w-4 mr-2" />
-                        {format(parseISO(nextRevision.dueDate), 'MMM d, yyyy')}
-                        {isDue && <span className="ml-2 text-primary font-semibold">(Due)</span>}
-                        {!isDue && revisionDaysLeft !== null && ` (in ${revisionDaysLeft + 1} days)`}
-                      </p>
+                        <span className="font-medium">Next: {format(parseISO(nextRevision.dueDate), 'do MMM, yyyy')}</span>
+                        {isDue ? 
+                            <span className="ml-2 text-primary font-semibold">(Due Today)</span>
+                            : (revisionDaysLeft !== null && ` (in ${revisionDaysLeft + 1} days)`)
+                        }
+                      </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground mt-1">You've mastered this topic!</p>
+                      <div className="pl-7 text-sm text-green-400 flex items-center mt-1">
+                        <CheckCircle2 className="h-4 w-4 mr-2" />
+                        <p className="font-semibold">You've mastered this topic!</p>
+                      </div>
                     )}
-                  </div>
-              </div>
-               <Button variant={isDue ? 'default' : 'secondary'} size="sm" disabled={!isDue} onClick={handleToggleRevision}>
-                  {isDue ? 'Revise' : 'Revise'}
-               </Button>
             </div>
-
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-2">Revision Progress</p>
-              <div className="flex items-center gap-1">
+        </CardContent>
+         <CardFooter className="p-4 pt-0">
+             <div>
+              <p className="text-xs font-medium text-muted-foreground mb-2">Revision Progress</p>
+              <div className="flex items-center gap-1.5 w-full">
                 {topic.revisions.map((rev, index) => (
                   <div 
                     key={index} 
@@ -134,9 +135,7 @@ export function TopicCard({ topic, setTopics }: TopicCardProps) {
                 ))}
               </div>
             </div>
-        </CardContent>
+        </CardFooter>
     </Card>
   );
 }
-
-    
