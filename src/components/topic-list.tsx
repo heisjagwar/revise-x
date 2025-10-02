@@ -84,7 +84,7 @@ export function TopicList({ topics, setTopics }: TopicListProps) {
             </div>
         </div>
         {filteredAndSortedTopics.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-4">
                 {filteredAndSortedTopics.map(topic => (
                     <TopicCard key={topic.id} topic={topic} setTopics={setTopics} />
                 ))}

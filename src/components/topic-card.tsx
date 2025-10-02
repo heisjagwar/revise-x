@@ -3,11 +3,12 @@
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import type { Topic } from '@/lib/types';
 import { format, parseISO, differenceInDays, isPast, isToday } from 'date-fns';
-import { History, Trash2, Calendar, Tags, CheckCircle2 } from 'lucide-react';
+import { History, Trash2, Calendar, Tags, CheckCircle2, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 import { Checkbox } from './ui/checkbox';
 import { Badge } from './ui/badge';
+import { cn } from '@/lib/utils';
 
 interface TopicCardProps {
   topic: Topic;
@@ -120,18 +121,34 @@ export function TopicCard({ topic, setTopics }: TopicCardProps) {
                     )}
             </div>
         </CardContent>
-         <CardFooter className="p-4 pt-0">
-             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-2">Revision Progress</p>
-              <div className="flex items-center gap-1.5 w-full">
+         <CardFooter className="p-4 pt-0 flex flex-col items-start w-full">
+            <p className="text-xs font-medium text-muted-foreground mb-3">Revision Progress</p>
+            <div className="flex items-center w-full" aria-label="Revision progress">
                 {topic.revisions.map((rev, index) => (
-                  <div 
-                    key={index} 
-                    className={`h-2 flex-1 rounded-full ${rev.completed ? 'bg-primary' : 'bg-muted'}`}
+                <div key={rev.day} className="flex items-center flex-1">
+                    <div
+                    className={cn(
+                        'w-6 h-6 rounded-full flex items-center justify-center border-2 text-xs font-bold z-10',
+                        rev.completed
+                        ? 'bg-green-500 border-green-500 text-white'
+                        : 'bg-card border-muted',
+                        index <= topic.revisions.findIndex(r => !r.completed) && 'border-primary'
+                    )}
                     title={`Day ${rev.day}: ${rev.completed ? 'Completed' : 'Pending'}`}
-                  />
+                    >
+                    {rev.completed ? <Check className="w-4 h-4" /> : rev.day}
+                    </div>
+
+                    {index < topic.revisions.length - 1 && (
+                    <div
+                        className={cn(
+                        'flex-1 h-0.5',
+                        rev.completed ? 'bg-green-500' : 'bg-muted'
+                        )}
+                    />
+                    )}
+                </div>
                 ))}
-              </div>
             </div>
         </CardFooter>
     </Card>
