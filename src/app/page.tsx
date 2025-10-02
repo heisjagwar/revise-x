@@ -5,11 +5,12 @@ import { MainHeader } from '@/components/main-header';
 import { TopicList } from '@/components/topic-list';
 import type { Topic } from '@/lib/types';
 import useLocalStorage from '@/lib/hooks/use-local-storage';
-import { add, sub, formatISO } from 'date-fns';
+import { add, sub, formatISO, isToday, parseISO } from 'date-fns';
 import { REVISION_DAYS } from '@/lib/types';
 import { AddTopicDialog } from '@/components/add-topic-dialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { sendDueTopicNotification, requestNotificationPermission } from '@/lib/notifications';
 
 const createInitialTopics = (): Topic[] => {
     const now = new Date();
@@ -82,8 +83,25 @@ export default function Home() {
     if (localStorage.getItem('revision-topics') === null) {
       setTopics(createInitialTopics());
     }
+
+    requestNotificationPermission();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (isClient && topics.length > 0) {
+      const dueTopics = topics.filter(topic => {
+        const nextRevision = topic.revisions.find(r => !r.completed);
+        if (!nextRevision) return false;
+        return isToday(parseISO(nextRevision.dueDate));
+      });
+
+      if (dueTopics.length > 0) {
+        sendDueTopicNotification(dueTopics.length);
+      }
+    }
+  }, [isClient, topics]);
+
 
   if (!isClient) {
     return (
