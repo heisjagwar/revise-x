@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,17 +33,16 @@ export function TopicCard({ topic, setTopics }: TopicCardProps) {
   }
   
   const handleToggleRevision = () => {
-    if (!nextRevision) return;
+    if (!nextRevision || !isDue) return;
 
     setTopics(prevTopics => 
       prevTopics.map(t => {
         if (t.id === topic.id) {
-          return {
-            ...t,
-            revisions: t.revisions.map(rev => 
-              rev.day === nextRevision.day ? { ...rev, completed: !rev.completed } : rev
-            ),
-          };
+          // Find the specific revision and toggle its completed status
+          const newRevisions = t.revisions.map(rev => 
+            rev.day === nextRevision.day ? { ...rev, completed: !rev.completed } : rev
+          );
+          return { ...t, revisions: newRevisions };
         }
         return t;
       })
@@ -110,7 +110,7 @@ export function TopicCard({ topic, setTopics }: TopicCardProps) {
                         <Calendar className="h-4 w-4 mr-2" />
                         {format(parseISO(nextRevision.dueDate), 'MMM d, yyyy')}
                         {isDue && <span className="ml-2 text-primary font-semibold">(Due)</span>}
-                        {!isDue && revisionDaysLeft !== null && ` (in ${revisionDaysLeft} days)`}
+                        {!isDue && revisionDaysLeft !== null && ` (in ${revisionDaysLeft + 1} days)`}
                       </p>
                     ) : (
                       <p className="text-sm text-muted-foreground mt-1">You've mastered this topic!</p>
@@ -118,7 +118,7 @@ export function TopicCard({ topic, setTopics }: TopicCardProps) {
                   </div>
               </div>
                <Button variant={isDue ? 'default' : 'secondary'} size="sm" disabled={!isDue} onClick={handleToggleRevision}>
-                  Mark as Done
+                  {isDue ? 'Revise' : 'Revise'}
                </Button>
             </div>
 
@@ -138,3 +138,5 @@ export function TopicCard({ topic, setTopics }: TopicCardProps) {
     </Card>
   );
 }
+
+    
