@@ -5,46 +5,70 @@ import { MainHeader } from '@/components/main-header';
 import { TopicList } from '@/components/topic-list';
 import type { Topic } from '@/lib/types';
 import useLocalStorage from '@/lib/hooks/use-local-storage';
-import { add } from 'date-fns';
-import { formatISO } from 'date-fns/formatISO';
+import { add, sub, formatISO } from 'date-fns';
 import { REVISION_DAYS } from '@/lib/types';
+import { AddTopicDialog } from '@/components/add-topic-dialog';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 const createInitialTopics = (): Topic[] => {
     const now = new Date();
     return [
         {
             id: '1',
-            name: 'Binary Search',
-            category: 'DSA',
-            createdAt: formatISO(now),
-            revisions: REVISION_DAYS.map(day => ({
+            name: 'Quantum Mechanics',
+            category: 'System Design',
+            createdAt: formatISO(sub(now, {days: 25})),
+            revisions: REVISION_DAYS.map((day, index) => ({
                 day,
-                completed: day < 12,
-                dueDate: formatISO(add(now, { days: day })),
+                completed: index < 2, 
+                dueDate: formatISO(add(sub(now, {days: 25}), { days: day })),
             }))
         },
         {
             id: '2',
-            name: 'Singleton Pattern',
-            category: 'OOPs',
-            createdAt: formatISO(add(now, { days: -10 })),
-            revisions: REVISION_DAYS.map(day => ({
+            name: 'Revision in: 5 days',
+            category: 'DSA',
+            createdAt: formatISO(sub(now, {days: 7})),
+            revisions: REVISION_DAYS.map((day, index) => ({
                 day,
-                completed: false,
-                dueDate: formatISO(add(add(now, { days: -10 }), { days: day })),
+                completed: index < 1,
+                dueDate: formatISO(add(sub(now, {days: 7}), { days: day })),
             }))
         },
          {
             id: '3',
-            name: 'Load Balancers',
-            category: 'System Design',
-            createdAt: formatISO(add(now, { days: -30 })),
+            name: 'Machine Learning',
+            category: 'DSA',
+            createdAt: formatISO(sub(now, { days: 2 })),
             revisions: REVISION_DAYS.map(day => ({
                 day,
-                completed: true,
-                dueDate: formatISO(add(add(now, { days: -30 }), { days: day })),
+                completed: false,
+                dueDate: formatISO(add(sub(now, { days: 2 }), { days: day })),
             }))
-        }
+        },
+        {
+            id: '4',
+            name: 'Theromdynamics',
+            category: 'OOPs',
+            createdAt: formatISO(sub(now, { days: 2 })),
+            revisions: REVISION_DAYS.map(day => ({
+                day,
+                completed: false,
+                dueDate: formatISO(add(sub(now, { days: 2 }), { days: day })),
+            }))
+        },
+        {
+            id: '5',
+            name: 'Calculus',
+            category: 'DSA',
+            createdAt: formatISO(sub(now, { days: 2 })),
+            revisions: REVISION_DAYS.map(day => ({
+                day,
+                completed: false,
+                dueDate: formatISO(add(sub(now, { days: 2 }), { days: day })),
+            }))
+        },
     ];
 };
 
@@ -70,11 +94,16 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <MainHeader setTopics={setTopics} />
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <MainHeader />
       <main className="flex-1 container mx-auto px-4 py-8">
         <TopicList topics={topics} setTopics={setTopics} />
       </main>
+       <AddTopicDialog setTopics={setTopics}>
+          <Button className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg" size="icon">
+            <Plus className="h-8 w-8" />
+          </Button>
+      </AddTopicDialog>
     </div>
   );
 }

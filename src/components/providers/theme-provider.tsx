@@ -4,6 +4,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Theme = 'light' | 'dark';
 
+type ThemeProviderProps = {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+  storageKey?: string;
+};
+
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
@@ -11,35 +17,45 @@ type ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
+export function ThemeProvider({ 
+  children, 
+  defaultTheme = 'system', 
+  storageKey = 'vite-ui-theme', 
+  ...props 
+}: ThemeProviderProps) {
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === 'undefined') {
+      return defaultTheme as Theme;
+    }
+    return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
+  });
 
   useEffect(() => {
-    const storedTheme = window.localStorage.getItem('theme') as Theme | null;
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const root = window.document.documentElement;
 
-    let initialTheme: Theme;
-    if (storedTheme) {
-        initialTheme = storedTheme;
-    } else {
-        initialTheme = systemPrefersDark ? 'dark' : 'light';
+    root.classList.remove('light', 'dark');
+
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.classList.add(systemTheme);
+      return;
     }
 
-    setThemeState(initialTheme);
-    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
-  }, []);
+    root.classList.add(theme);
+  }, [theme]);
 
-  const setTheme = (newTheme: Theme) => {
-    window.localStorage.setItem('theme', newTheme);
-    setThemeState(newTheme);
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(newTheme);
+  const value = {
+    theme,
+    setTheme: (newTheme: Theme) => {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, newTheme);
+      }
+      setTheme(newTheme);
+    },
   };
 
-  const value = { theme, setTheme };
-
   return (
-    <ThemeProviderContext.Provider value={value}>
+    <ThemeProviderContext.Provider {...props} value={value}>
       {children}
     </ThemeProviderContext.Provider>
   );

@@ -74,24 +74,24 @@ export function AddTopicDialog({ children, setTopics }: AddTopicDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-card text-card-foreground border-border">
         <DialogHeader>
-          <DialogTitle>Add New Revision Topic</DialogTitle>
+          <DialogTitle>Add New Topic</DialogTitle>
           <DialogDescription>
-            Enter the details of the topic you've studied. We'll set up the revision schedule for you.
+            Enter the details of the topic you've studied.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
-              Topic Name
+              Topic
             </Label>
             <Input
               id="name"
               value={topicName}
               onChange={(e) => setTopicName(e.target.value)}
               className="col-span-3"
-              placeholder="e.g., Dynamic Programming"
+              placeholder="e.g., Quantum Mechanics"
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -111,7 +111,7 @@ export function AddTopicDialog({ children, setTopics }: AddTopicDialogProps) {
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit}>Create Topic</Button>
+          <Button onClick={handleSubmit} className="w-full">Create Topic</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
