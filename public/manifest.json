@@ -4,8 +4,13 @@
   "description": "A smart revision tracker to help you remember anything.",
   "start_url": "/",
   "display": "standalone",
+<<<<<<< HEAD
   "background_color": "#0C0A09",
   "theme_color": "#8B5CF6",
+=======
+  "background_color": "#18181B",
+  "theme_color": "#18181B",
+>>>>>>> bravo
   "icons": [
     {
       "src": "/icons/icon-192x192.png",

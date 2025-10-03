@@ -21,12 +21,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-<<<<<<< HEAD
         <meta name="theme-color" content="#8B5CF6" />
         <link rel="manifest" href="/manifest.json" />
-=======
-        <meta name="theme-color" content="#18181B" />
->>>>>>> bravo
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider defaultTheme="dark" storageKey="recall-theme">
