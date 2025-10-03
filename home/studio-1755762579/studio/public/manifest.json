@@ -1,7 +1,7 @@
 {
-  "name": "Recall: A smart revision tracker.",
+  "name": "Recall: Smart Revision",
   "short_name": "Recall",
-  "description": "A smart revision tracker to help you retain what you learn.",
+  "description": "A smart revision tracker to help you remember everything.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#18181B",
